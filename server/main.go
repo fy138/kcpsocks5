@@ -36,11 +36,6 @@ var VERSION = "SELFBUILD"
 
 // handle multiplex-ed connection
 func handleMux(conn net.Conn, config *Config) {
-	// check if target is unix domain socket
-	var isUnix bool
-	if _, _, err := net.SplitHostPort(config.Target); err != nil {
-		isUnix = true
-	}
 	log.Println("smux version:", config.SmuxVer, "on connection:", conn.LocalAddr(), "->", conn.RemoteAddr())
 
 	// stream multiplex
@@ -63,23 +58,25 @@ func handleMux(conn net.Conn, config *Config) {
 			log.Println(err)
 			return
 		}
+		go socks5(stream)
+		/*
+			go func(p1 *smux.Stream) {
+				var p2 net.Conn
+				var err error
+				if !isUnix {
+					p2, err = net.Dial("tcp", config.Target)
+				} else {
+					p2, err = net.Dial("unix", config.Target)
+				}
 
-		go func(p1 *smux.Stream) {
-			var p2 net.Conn
-			var err error
-			if !isUnix {
-				p2, err = net.Dial("tcp", config.Target)
-			} else {
-				p2, err = net.Dial("unix", config.Target)
-			}
-
-			if err != nil {
-				log.Println(err)
-				p1.Close()
-				return
-			}
-			handleClient(p1, p2, config.Quiet)
-		}(stream)
+				if err != nil {
+					log.Println(err)
+					p1.Close()
+					return
+				}
+				handleClient(p1, p2, config.Quiet)
+			}(stream)
+		*/
 	}
 }
 
