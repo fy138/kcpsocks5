@@ -132,11 +132,11 @@ func main() {
 			Value: ":29900",
 			Usage: `kcp server listen address, eg: "IP:29900" for a single port, "IP:minport-maxport" for port range`,
 		},
-		cli.StringFlag{
+		/*	cli.StringFlag{
 			Name:  "target, t",
 			Value: "127.0.0.1:12948",
 			Usage: "target server address, or path/to/unix_socket",
-		},
+		}, */
 		cli.StringFlag{
 			Name:   "key",
 			Value:  "it's a secrect",
