@@ -15,7 +15,7 @@ func socks5(client *smux.Stream) {
 	defer client.Close()
 
 	b := make([]byte, 1024)
-	n, err := client.Read(b[:])
+	_, err := client.Read(b[:])
 	if err != nil {
 		//log.Println(err)
 		client.Close()
@@ -26,7 +26,12 @@ func socks5(client *smux.Stream) {
 		return
 	}
 	client.Write([]byte{0x05, 0x00}) //不需要验证
-	n, err = client.Read(b[:])
+	_, err = client.Read(b[:])
+	if err != nil {
+		//log.Println(err)
+		client.Close()
+		return
+	}
 	//log.Printf("====>%v", b)
 	var host, port string
 
