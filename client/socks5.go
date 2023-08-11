@@ -1,18 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"log"
 	"net"
 	"strconv"
-
-	"github.com/xtaci/kcptun/generic"
-	"github.com/xtaci/smux"
 )
 
-func socks5(client *smux.Stream) {
-	defer client.Close()
+func socks5(client net.Conn) (objhost string, err error) {
+	//defer client.Close()
 
 	b := make([]byte, 1024)
 	n, err := client.Read(b[:])
@@ -44,26 +38,29 @@ func socks5(client *smux.Stream) {
 		host = net.IP{b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13], b[14], b[15], b[16], b[17], b[18], b[19]}.String()
 	}
 	port = strconv.Itoa(int(b[n-2])<<8 | int(b[n-1]))
-	objhost := net.JoinHostPort(host, port)
-
-	p2, err := net.Dial("tcp", objhost)
-	if err != nil {
-		log.Println("no server available")
-		client.Write([]byte{0x05, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}) //响应客户端连接失败
-		client.Close()
-		return
-	}
+	objhost = net.JoinHostPort(host, port)
 	client.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}) //响应客户端连接成功
-	streamCopy := func(dst io.Writer, src io.ReadCloser) {
-		if _, err := generic.Copy(dst, src); err != nil {
-			if err == smux.ErrInvalidProtocol {
-				log.Println("smux", err, "in:", fmt.Sprint(client.RemoteAddr(), "(", client.ID(), ")"), "out:", p2.RemoteAddr())
-			}
+	/*
+		p2, err := net.Dial("tcp", objhost)
+		if err != nil {
+			log.Println("no server available")
+			client.Write([]byte{0x05, 0x03, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}) //响应客户端连接失败
+			client.Close()
+			return
 		}
-		client.Close()
-		p2.Close()
-	}
+		client.Write([]byte{0x05, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}) //响应客户端连接成功
+		streamCopy := func(dst io.Writer, src io.ReadCloser) {
+			if _, err := generic.Copy(dst, src); err != nil {
+				if err == smux.ErrInvalidProtocol {
+					log.Println("smux", err, "in:", fmt.Sprint(client.RemoteAddr(), "(", client.ID(), ")"), "out:", p2.RemoteAddr())
+				}
+			}
+			client.Close()
+			p2.Close()
+		}
 
-	go streamCopy(p2, client)
-	streamCopy(client, p2)
+		go streamCopy(p2, client)
+		streamCopy(client, p2)
+	*/
+	return
 }

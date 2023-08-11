@@ -58,25 +58,29 @@ func handleMux(conn net.Conn, config *Config) {
 			log.Println(err)
 			return
 		}
-		go socks5(stream)
-		/*
-			go func(p1 *smux.Stream) {
-				var p2 net.Conn
-				var err error
-				if !isUnix {
-					p2, err = net.Dial("tcp", config.Target)
-				} else {
-					p2, err = net.Dial("unix", config.Target)
-				}
+		//go socks5(stream)
+		b := make([]byte, 1024)
+		n, err := stream.Read(b)
 
-				if err != nil {
-					log.Println(err)
-					p1.Close()
-					return
-				}
-				handleClient(p1, p2, config.Quiet)
-			}(stream)
-		*/
+		go func(p1 *smux.Stream, targethost string) {
+			var p2 net.Conn
+			var err error
+			//if !isUnix {
+			p2, err = net.Dial("tcp", targethost)
+			log.Println(targethost)
+
+			//} else {
+			//	p2, err = net.Dial("unix", config.Target)
+			//}
+
+			if err != nil {
+				log.Println("connect to:", targethost, "  error:", err)
+				p1.Close()
+				return
+			}
+			handleClient(p1, p2, config.Quiet)
+		}(stream, string(b[:n]))
+
 	}
 }
 
