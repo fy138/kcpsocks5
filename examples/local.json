@@ -23,5 +23,6 @@
 	"keepalive": 10,
 	"autoexpire": 1800,
 	"quiet": false,
-	"tcp": false
+	"tcp": false,
+	"conn":15
 }

@@ -39,11 +39,6 @@ func handleClient(session *smux.Session, p1 net.Conn, quiet bool) {
 		}
 	}
 	defer p1.Close()
-	targethost, err := socks5(p1)
-	if err != nil {
-		log.Println("get addr error", err)
-		return
-	}
 
 	p2, err := session.OpenStream()
 	if err != nil {
@@ -52,6 +47,11 @@ func handleClient(session *smux.Session, p1 net.Conn, quiet bool) {
 	}
 
 	defer p2.Close()
+	targethost, err := socks5(p1)
+	if err != nil {
+		log.Println("get addr error", err)
+		return
+	}
 	_, err = p2.Write([]byte(targethost)) //发送地址
 	if err != nil {
 		log.Println(err)
@@ -455,8 +455,8 @@ func main() {
 		//go generic.SnmpLogger(config.SnmpLog, config.SnmpPeriod)
 
 		// start scavenger
-		chScavenger := make(chan timedSession, 128)
-		go scavenger(chScavenger, &config)
+		//chScavenger := make(chan timedSession, 128)
+		//go scavenger(chScavenger, &config)
 
 		// start listener
 		numconn := uint16(config.Conn)
@@ -474,9 +474,9 @@ func main() {
 				(config.AutoExpire > 0 && time.Now().After(muxes[idx].expiryDate)) {
 				muxes[idx].session = waitConn()
 				muxes[idx].expiryDate = time.Now().Add(time.Duration(config.AutoExpire) * time.Second)
-				if config.AutoExpire > 0 { // only when autoexpire set
-					chScavenger <- muxes[idx]
-				}
+				//if config.AutoExpire > 0 { // only when autoexpire set
+				//	chScavenger <- muxes[idx]
+				//}
 			}
 
 			go handleClient(muxes[idx].session, p1, config.Quiet)

@@ -66,6 +66,11 @@ func handleMux(conn net.Conn, config *Config) {
 			var p2 net.Conn
 			var err error
 			//if !isUnix {
+			if len(targethost) == 0 {
+				p1.Close()
+				return
+			}
+
 			p2, err = net.Dial("tcp", targethost)
 			log.Println(targethost)
 
