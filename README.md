@@ -1,4 +1,8 @@
-# <img src="logo.png" alt="kcptun" height="54px" /> 
+# A socks5 server base on kcptun 一个基于Kcptun的scoks5服器,速度很快，配置文件在example文件夹，运行方式与下面介绍相同
+```
+server -c server.json
+client -c local.json
+```
 
 [![Release][13]][14] [![Powered][17]][18] [![MIT licensed][11]][12] [![Build Status][3]][4] [![Go Report Card][5]][6] [![Downloads][15]][16] [![Docker][1]][2] 
 
