@@ -38,6 +38,7 @@ func handleClient(session *smux.Session, p1 net.Conn, quiet bool) {
 			log.Println(v...)
 		}
 	}
+	//logln("new stream start...")
 	defer p1.Close()
 
 	p2, err := session.OpenStream()

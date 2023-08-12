@@ -72,7 +72,7 @@ func handleMux(conn net.Conn, config *Config) {
 			}
 
 			p2, err = net.Dial("tcp", targethost)
-			log.Println(targethost)
+			//log.Println(targethost)
 
 			//} else {
 			//	p2, err = net.Dial("unix", config.Target)
